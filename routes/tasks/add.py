@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, flash
+from flask import Blueprint, request, session, redirect, url_for, flash
 from db import get_db_connection, is_task_name_duplicate
 
 add_bp = Blueprint('add_task', __name__)
@@ -14,15 +14,23 @@ def add_task():
     if name and is_task_name_duplicate(name):
         flash(f"Error: Task name '{name}' already exists. Please choose a different name.", 'error')
         return redirect(url_for('view_tasks.index'))
+    
+    if name and len(name) > 50:
+        flash(f"Error: Task name must be 50 characters or less. Current length: {len(name)} characters.", 'error')
+        return redirect(url_for('view_tasks.index'))
+    
+    if desc and len(desc) > 500:
+        flash(f"Error: Description must be 500 characters or less. Current length: {len(desc)} characters.", 'error')
+        return redirect(url_for('view_tasks.index'))
 
     if name and desc:
         conn = get_db_connection()
         conn.execute(
             '''
-            INSERT INTO tasks (task_name, task_description, due_date, status)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO tasks (user_id,task_name, task_description, due_date, status)
+            VALUES (?, ?, ?, ?, ?)
             ''',
-            (name, desc, due_date, status)
+            (session['user_id'],name, desc, due_date, status)
         )
         conn.commit()
         conn.close()

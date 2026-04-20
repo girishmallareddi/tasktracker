@@ -15,6 +15,13 @@ def edit_task(task_id):
         flash(f"Error: Task name '{name}' already exists. Please choose a different name.", 'error')
         return redirect(url_for('view_tasks.index'))
 
+    if name and len(name) > 50:
+        flash(f"Error: Task name must be 50 characters or less. Current length: {len(name)} characters.", 'error')
+        return redirect(url_for('view_tasks.index'))
+
+    if desc and len(desc) > 500:
+        flash(f"Error: Description must be 500 characters or less. Current length: {len(desc)} characters.", 'error')
+        return redirect(url_for('view_tasks.index'))
     conn = get_db_connection()
 
     task = conn.execute(
