@@ -17,12 +17,20 @@ def init_db():
     conn.execute("""
         CREATE TABLE IF NOT EXISTS tasks(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
             task_name TEXT NOT NULL,
             task_description TEXT NOT NULL,
             due_date TEXT,
             status TEXT
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS users(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+        """)
     conn.commit()
     conn.close()
 
